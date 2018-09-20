@@ -34,9 +34,20 @@
       .text(function(d,i) {
         return d;
       });
-    /*console.log(typeof p);//无法通过p.d访问
-    console.log(typeof q);
-    console.log(q.data.d);//对对象q进行测试,返回显示undefined*/
-    console.log(q.data("test").text(function(d){return "HelloWorld";}));
+      //1.d存在data中
+      //2.d存在于text中
+    console.log(q.data(function(d)
+    {if(!d){
+      console.log("对象不存在");return "对象不存在";
+    }else{
+      console.log("对象存在");return "对象存在";
+    }
+  }).text(function(d){
+    if(!d){
+      console.log("对象不存在");return "对象不存在";
+    }else{
+      console.log("对象存在");return "对象存在";
+    }
+  }));
   </script>
 </body>
