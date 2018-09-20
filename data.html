@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>HelloWorld</title>
+</head>
+
+<body>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <p>Fire</p>
+  <p>Water</p>
+  <p>Wind</p>
+
+  <script>
+    var dataset = ["I like dog", "I like cat", "I like snake"];
+    var body = d3.select("body");
+    var p = body.selectAll("p");
+    var q = body.select("p");
+    p.data(dataset)
+      .text(function(d, i) {
+        console.log("第"+i+"个d是"+d);
+        return d;
+      });
+    dataset[0]="hello";//不能直接修改p标签内的内容
+    p.data(function(d){
+      if(typeof d == "string"){
+        console.log("在data中d是存在的，其值是"+d);
+      }else{
+        console.log("data中d不存在");
+      }
+      dataset[1] = "world";
+      return dataset;})
+      .text(function(d,i) {
+        return d;
+      });
+    /*console.log(typeof p);//无法通过p.d访问
+    console.log(typeof q);
+    console.log(q.data.d);//对对象q进行测试,返回显示undefined*/
+    console.log(q.data("test").text(function(d){return "HelloWorld";}));
+  </script>
+</body>

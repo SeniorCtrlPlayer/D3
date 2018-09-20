@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>HelloWorld</title>
+</head>
+
+<body>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <p>Fire</p>
+  <p>Water</p>
+  <p>Wind</p>
+
+  <script>
+    //选择body中所有的p元素，选择集结果赋值给变量p
+    var p = d3.select("body").selectAll("p");
+    console.log('绑定数据前'+p.datum())
+    //绑定数值7到选择集上
+    p.datum(7);
+    console.log('绑定数据之后'+p.datum());
+    //在控制台输出选择集
+    console.log(p);
+    //测试text
+    console.log(p.text());
+  </script>
+</body>
