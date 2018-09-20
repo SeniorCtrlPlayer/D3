@@ -9,12 +9,14 @@
 <body>
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <p>Apple</p>
-  <p>Pear</p>
+  <p id="myid">Pear</p>
   <p>Banana</p>
 
   <script>
     var p1 = d3.select("p");//默认选择第一个P标签元素
     p1.style("color","red");
+	var p2 = d3.select("#myid");
+	p2.style("color","green");
     /*var dataset = ["I like dog", "I like cat", "I like snake"];
     var body = d3.select("body");
     var p = body.selectAll("p");
