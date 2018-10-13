@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>归并排序</title>
+</head>
+<body>
+  <p></p>
+  <p></p>
+  <script>
+  var origin = [2,5,3,6,4,1];
+  console.log("原数组为："+origin);
+	function sort(a,b){
+    //console.log("input: "+a+"|"+b);
+		var i=j=0;
+		var c=[];
+		for(var t=0;t<a.length+b.length;t++){
+			if((a[i]>b[j]&&j<b.length)||i==a.length){
+        if(i!=a.length)
+        {
+          for(var m=i;m<a.length;m++)
+          {
+            console.log("("+a[m]+","+b[j]+")");
+          }
+        }
+        c[t]=b[j];
+				j++;
+			}else if(i<a.length||j==b.length){
+				c[t]=a[i];
+				i++;
+			}
+		}
+    //console.log("out: "+c);
+		return c;
+	}
+  function test1(d){
+		k=Math.floor(d.length/2);
+		var a=[];
+		var b=[];
+		for (var i=0;i<k;i++){
+			a[i]=d[i];
+		}
+		for (var i=k;i<d.length;i++){
+			b[i-k]=d[i];
+		}
+    //console.log("a:"+a+",b:"+b);
+    if(a.length==1){
+      if(b.length==1){
+        return sort(a,b);
+      }else{
+        return sort(a,test1(b));
+      }
+    }else{
+      return sort(test1(a),test1(b));
+    }
+	}
+  console.log("归并排序后："+test1(origin));
+  </script>
+</body>
+</html>
