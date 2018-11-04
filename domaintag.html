@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style type="text/css">
+  input {
+    width:20px;
+  }
+  td {
+    width: 20px;
+  }
+  th {
+    width: 60px;
+  }
+  tr {
+    text-align: center;
+  }
+  </style>
+</head>
+<body>
+<div id="d">
+<table id="table" align="center" border="1">
+  <tbody>
+  <tr id="head_tr">
+    <th rowspan="2">进程/资源情况</th>
+    <th colspan="3">Max</th>
+    <th colspan="3">Allocation</th>
+    <th colspan="3">Need</th>
+    <th colspan="3">Available</th>
+  </tr>
+  <tr id="resource_tr"></tr>
+  </tbody>
+</table>
+</div>
+</body>
+<script type="text/javascript">
+  //首先找到Id为d的元素
+  var resource_number = 3;//定义资源种类数
+  var table = document.getElementById('table');
+  //创建一个节点
+  var tag_head = document.getElementById('head_tr').cells;
+  var tag_resource = document.getElementById('resource_tr');
+  for(var i=0;i<4;i++){
+    tag_head[i].colspan=resource_number;
+  }
+  for(var i=0;i<4;i++){
+    for(var j=0;j<resource_number;j++){
+      var tag = document.createElement('td');
+      tag.innerText=String.fromCharCode(65+j);
+      tag_resource.appendChild(tag);
+    }
+  }
+</script>
+</html>

@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>操作系统第三题</title>
+    <script>
+      function checkForm(){
+          var url="操作系统3_1.html?method=";
+          var flag =true;
+          var nums = document.getElementsByName("number");
+          var reg = /^\d+$/;
+          var radio = document.getElementById("auto");
+          if(radio.checked){
+              url+="auto";
+              console.log("自动生成方式被选中");
+          }else {
+              url+="diy";
+              console.log("手动输入方式被选中");
+          }
+          for(var i=0;i<nums.length;i++){
+              if(!reg.test(nums[i].value)){
+                  alert("请输入数字");
+                  flag=false;
+                  break;
+              }
+              url=url+"&="+nums[i].value;
+              //url+"?method="+value0+
+          }
+          if(flag){
+             document.getElementById("myform").action = url;
+             document.getElementById("myform").submit();
+          }
+      }
+    </script>
+  </head>
+  <body align="center">
+  <div align="center">
+  <form id="myform" action="" method="post">
+  资源种类数<br>
+  <input onkeyup="this.value.replace(/[^\d]/g,'');" type="text" name="number"><br>
+  进程数<br>
+  <input onkeyup="this.value.replace(/[^\d]/g,'');" type="text" name="number"><br>
+  <input name="method" checked type="radio" id="auto"/>自动生成
+  <input name="method" type="radio">手动输入
+  <br>
+  <input type="button" value="提交" onclick="checkForm()">
+  </form>
+  </div>
+  </body>
+</html>
