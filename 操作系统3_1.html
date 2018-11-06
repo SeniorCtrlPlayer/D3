@@ -8,6 +8,9 @@
   tr {
     text-align: center;
   }
+  button {
+	width:25px;
+  }
   </style>
 </head>
 <body>
@@ -27,7 +30,10 @@
       <select id="select">
       </select>
     </td>
-    <td><button type="button" onclick="test()">提交</button></td>
+	<th id="state">状态:</th>
+	<th id="news"></th>
+    <td id="commit"><button type="button" onclick="commit()" >提交</button></td>
+	<td><button type="button" onclick="judge()">检测</button></td>
   </tr>
   </tbody>
 </table>
@@ -35,27 +41,36 @@
 </body>
   <script type="text/javascript">
   var mrp = getxyz();//method_resource_process
+  //****************************************************
+  //mrp[i]都为字符串类型
+  //var x=mrp[i];
+  //var a = new Array(x);
+  //a.length = 1;
+  //****************************************************
   method = mrp[0];
-  resource_number = mrp[1];
-  process_number = mrp[2];
+  resource_number = parseInt(mrp[1]);
+  console.log(resource_number);
+  process_number = parseInt(mrp[2]);
+  console.log(process_number);
   drawtable(resource_number, process_number);
-
   var Max = new Array(process_number);
   var Allocation = new Array(process_number);
   var Need = new Array(process_number);
   var Available = new Array(resource_number);
-
+  console.log('Available初始长度为: '+Available.length);
   for(var i=0;i<process_number;i++){
     Max[i]=new Array(resource_number);
     Allocation[i]=new Array(resource_number);
     Need[i]=new Array(resource_number);
-    Available[i]=new Array(resource_number);
   }
-
+  // if(judge(Max, Allocation, Need, Available)){
+	//  console.log('安全');
+  // }else{
+	//  console.log('不安全');
+  // }
   //画表函数
   function drawtable(resource_number, process_number){
     var table = document.getElementById('tbody');
-
     var tag_head = document.getElementById('head_tr').cells;
     var tag_resource = document.getElementById('resource_tr');
     var request_resource = document.getElementById('request_resource');
@@ -65,7 +80,6 @@
     for(var i=1;i<5;i++){
       tag_head[i].colSpan=resource_number;//不是colspan而是colSpan
     }
-
     for(var i=0;i<4;i++){
       for(var j=0;j<resource_number;j++){
         var tag = document.createElement('td');
@@ -73,7 +87,6 @@
         tag_resource.appendChild(tag);
       }
     }
-
     for(var i=0;i<process_number;i++){//i代表行
       var tr=document.createElement('tr');//建立行
       table.insertBefore(tr,request_resource);//将行加入表中
@@ -92,15 +105,23 @@
         }
       }
     }
-
     for(var i=0;i<process_number;i++){
       var option = document.createElement('option');
       option.value = i;
       option.innerText = 'P'+i;
       select.appendChild(option);
     }
+	var state = document.getElementById('state');
+	state.colSpan=resource_number;
+	document.getElementById('news').colSpan=resource_number;
+	for(var i=0;i<resource_number;i++){
+		var resource = document.createElement('td');
+		request_resource.insertBefore(resource,state);
+		var input = document.createElement('input');
+		resource.appendChild(input);
+		input.name = 'apply';
+	}
   }
-
   //获取页面一提交的三个参数
   function getxyz(){
       var query = location.search.substring(1);
@@ -112,44 +133,101 @@
         if (pos == -1) continue;
         value[i]=values[i].substring(pos+1);
       }
-      return value;
+      return value;//返回的value为字符串数组
   }
-
-  function test(){
+  function commit(){
     //形成矩阵测试
     //0 1  2 3  4 5  6 7
+	var news = document.getElementById('news');
     var test = document.getElementsByName('value');
     for(var i=0;i<process_number;i++){
       for(var j=0;j<resource_number;j++){
-        Max[i][j]=test[4*i*resource_number+j];
-        Allocation[i][j]=test[4*i*resource_number+resource_number+j];
-        Need[i][j]=test[4*i*resource_number+resource_number*2+j];
+        Max[i][j]=parseInt(test[4*i*resource_number+j].value);
+        Allocation[i][j]=parseInt(test[4*i*resource_number+resource_number*1+j].value);
+        //当i=0,j=0时
+        //4*i*resource_number+resource_number*1+j = 2
+        //4*i*resource_number+resource_number+j = 010
+
+        Need[i][j]=parseInt(test[4*i*resource_number+resource_number*2+j].value);
         if(i==0){
-          Available[j]=test[4*i*resource_number+resource_number*3+j];
+          Available[j]=parseInt(test[4*i*resource_number+resource_number*3+j].value);
         }
       }
     }
     //矩阵测试
-    for(var i=0;i<Max.length;i++){
-      for(var j=0;j<Max[0].length;j++){
-        console.log(Max[i][j].value);
-      }
-    }
-    for(var i=0;i<Available.length;i++){
-      console.log(Available[i].value);
-    }
+    //Max,Available矩阵测试成功
+    // for(var i=0;i<Max.length;i++){
+    //   for(var j=0;j<Max[0].length;j++){
+    //     console.log(Max[i][j]);
+    //   }
+    // }
+    // for(var i=0;i<Need.length;i++){
+    //   for(var j=0;j<Need[0].length;j++){
+    //     console.log(Need[i][j]);
+    //   }
+    // }
+    // for(var i=0;i<Allocation.length;i++){
+    //   for(var j=0;j<Allocation[0].length;j++){
+    //     console.log(Allocation[i][j]);
+    //   }
+    // }
   }
 
-  function judge(Max, Allocation, Need, Available){
-    for(var i=0;)
-    for(var i=0;i<process_number;i++){
-      for(var j=0;j<resource_number;j++){
-        if(Available[j]>Need[i][j])
-      }
-    }
+  function judge(){//Max, Allocation, Need, Available
+	var flag = new Array(process_number);
+	for(var i=0;i<flag.length;i++){
+		flag[i]=true;//将长度为process_number的标志数组全都置为true
+	}
+
+  var n = 0;
+  var i;
+  console.log(typeof n);
+	// for(var n=0;n<process_number && p;n++){//总共遍历process_number轮，每次遍历必释放一个进程
+	// 	p=false;//默认不继续
+	// 	console.log('进入判断循环');
+		for(i=0;i<process_number && flag[i];i++){//正在遍历第i行
+			if(judge_a_line(Need[i],Available)){
+				console.log('资源可分配');
+				//将标志置为false
+				flag[i]=false;
+				//将Allocation清零，并将资源回收至Available
+				release_a_line(Max[i],Allocation[i],Need[i],Available);
+        console.log(Available[0]);
+				//打开继续锁
+        n++;
+        if(n==process_number){
+          break;
+        }
+        i = 0;
+        continue;
+			}
+		}
+	// }
+
+	if(n==process_number){
+		news.innerText = '安全';
+	}else{
+		news.innerText = '不安全';
+	}
   }
 
-  function judge_a_line(Need_a_line, Available){
+  function judge_a_line(Need_a_line, Available){//传入的参数为大小为process_number的两个一维数组
+	var flag = true;//初始信号为真
+	for(i=0;i<resource_number;i++){
+		if(Need_a_line[i]>Available[i]){
+			flag = false;//如果需求超过允许则将信号置为false,并且退出循环
+			break;
+		}
+	}
+	return flag;//返回判断信号
+  }
+
+  function release_a_line(Max_a_line, Allocation_a_line, Need_a_line, Available){//传入的参数为大小为process_number的三个一维数组
+	for(i=0;i<resource_number;i++){
+		Available[i]=Available[i]+Allocation_a_line[i];
+		Allocation_a_line[i]=0;
+		Need_a_line[i]=Max_a_line[i];
+	}
   }
   </script>
 </html>
