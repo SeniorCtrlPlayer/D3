@@ -219,35 +219,37 @@ function judge(Max, Allocation, Need, Available){
     }
     
     var n = 0;
-    var i;
+    var i = 0;
     //console.log(typeof n);
     // for(var n=0;n<process_number && p;n++){//总共遍历process_number轮，每次遍历必释放一个进程
     // 	p=false;//默认不继续
     // 	console.log('进入判断循环');
-    for(i=0;i<process_number && flag[i];i++){//正在遍历第i行
+    while(i<process_number && flag[i]){//正在遍历第i行
         if(judge_a_line(Need_judge[i],Available_judge)){
             console.log('资源可分配');
             //将标志置为false
             flag[i]=false;
             //并将资源回收至Available
             release_a_line(Allocation_judge[i],Available_judge);
-            //打开继续锁
+            
+            //总是判断能够分配的最前面一个资源
             n++;
-            if(n==process_number){
-                break;
+            console.log('n is '+n);
+            if(n!=process_number){
+                console.log('重置i');
+                i = 0;
+                continue;
             }
-            i = 0;
-            continue;
         }
+        i++;
     }
-    // }
-    
+
     if(n==process_number){
         news.innerText = '安全';
     }else{
         news.innerText = '不安全';
     }
-    
+
     //testnumber=1;
     //console.log(testnumber);
 }
