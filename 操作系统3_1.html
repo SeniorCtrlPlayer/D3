@@ -58,8 +58,11 @@
     var Allocation = new Array(process_number);
     var Need = new Array(process_number);
     var Available = new Array(resource_number);
-    var ObjectMatrix;
     //console.log('Available初始长度为: '+Available.length);
+    var flag0 = new Array(resource_number);
+    for(var i=0;i<resource_number;i++){
+        flag0[i]=0;
+    }
     
     //初始化输入框架
     for(var i=0;i<process_number;i++){
@@ -148,18 +151,18 @@ function updatematrix(){
     //形成矩阵测试
     //0 1  2 3  4 5  6 7
     var news = document.getElementById('news');
-    var test = document.getElementsByName('value');
+    var ObjectMatrix = document.getElementsByName('value');
     for(var i=0;i<process_number;i++){
         for(var j=0;j<resource_number;j++){
-            Max[i][j]=parseInt(test[4*i*resource_number+j].value);
-            Allocation[i][j]=parseInt(test[4*i*resource_number+resource_number*1+j].value);
+            Max[i][j]=parseInt(ObjectMatrix[4*i*resource_number+j].value);
+            Allocation[i][j]=parseInt(ObjectMatrix[4*i*resource_number+resource_number*1+j].value);
             //当i=0,j=0时
             //4*i*resource_number+resource_number*1+j = 2
             //4*i*resource_number+resource_number+j = 010
             
-            Need[i][j]=parseInt(test[4*i*resource_number+resource_number*2+j].value);
+            Need[i][j]=parseInt(ObjectMatrix[4*i*resource_number+resource_number*2+j].value);
             if(i==0){
-                Available[j]=parseInt(test[4*i*resource_number+resource_number*3+j].value);
+                Available[j]=parseInt(ObjectMatrix[resource_number*3+j].value);
             }
         }
     }
@@ -236,7 +239,7 @@ function judge(Max, Allocation, Need, Available){
                 
                 //总是判断能够分配的最前面一个资源
                 n++;
-                console.log('n is '+n);
+                //console.log('n is '+n);
                 if(n!=process_number){
                     console.log('重置i');
                     i = 0;
@@ -249,12 +252,11 @@ function judge(Max, Allocation, Need, Available){
 
     if(n==process_number){
         news.innerText = '安全';
+        return true;
     }else{
         news.innerText = '不安全';
+        return false;
     }
-
-    //testnumber=1;
-    //console.log(testnumber);
 }
 
 function judge_a_line(Need_a_line, Available){//传入的参数为大小为process_number的两个一维数组
@@ -270,17 +272,17 @@ function judge_a_line(Need_a_line, Available){//传入的参数为大小为proce
 
 function release_a_line(Allocation_a_line, Available_judge){
     //传入的参数为大小为process_number的两个一维数组
-    console.log('before: '+Available_judge[0]);
+    //console.log('before: '+Available_judge[0]);
     for(i=0;i<resource_number;i++){
         Available_judge[i]=Available_judge[i]+Allocation_a_line[i];
     }
-    console.log('after: '+Available_judge[0]);
+    //console.log('after: '+Available_judge[0]);
     //console.log('the Available is '+Available[0]);
 }
 
 function commit(Max,Allocation,Need,Available){
     //console.log(testnumber);
-    //updatematrix();
+    updatematrix();
     //获取到请求的进程
     //console.log(Max[0][0]);
     var Max_commit = Max;
@@ -305,21 +307,45 @@ function commit(Max,Allocation,Need,Available){
     if(judge_a_line(application, Available_commit)){
         //对进程select_process的资源进行更新
         for(var i=0;i<resource_number;i++){
+            console.log(Allocation_commit[select_process][i]);
             Allocation_commit[select_process][i]+=application[i];
+            console.log(Allocation_commit[select_process][i]);
             Need_commit[select_process][i]=Need_commit[select_process][i]-application[i];
             Available_commit[i]=Available_commit[i]-application[i];
         }
         if(judge(Max_commit, Allocation_commit, Need_commit, Available_commit)){
-            console.log('允许申请');
+            update_line(select_process,Allocation_commit,Need_commit,Available_commit);
         }
     }else{
         alert('超过了可用资源数');
     }
 }
 
-function update_line(select_process,Application,Allocation,Need,Available){
-    //var
-    for(var i=0;i<resource_number;i++){
+function update_line(select_process,Allocation_commit,Need_commit,Available_commit){
+    var ObjectMatrix = document.getElementsByName('value');
+    console.log('成功进入更新');
+    
+    //判断将Allocation的值回收或者更新
+    if(!judge_a_line(Need_commit[select_process],flag0)){
+        for(var i=0;i<resource_number;i++){
+            console.log(Allocation_commit[select_process][i]);
+            console.log(ObjectMatrix[4*select_process*resource_number+resource_number*1+i].value);
+            
+            //Allocation
+            ObjectMatrix[4*select_process*resource_number+resource_number*1+i].value=Allocation_commit[select_process][i];
+            
+            //Need
+            ObjectMatrix[4*select_process*resource_number+resource_number*2+i].value=Need_commit[select_process][i];
+            
+            //Available
+            ObjectMatrix[resource_number*3+i].value=Available_commit[i];
+        }
+    }else{
+        for(var i=0;i<resource_number;i++){
+            ObjectMatrix[4*select_process*resource_number+resource_number*1+i].value=0;
+            ObjectMatrix[4*select_process*resource_number+resource_number*2+i].value=0;
+            ObjectMatrix[4*select_process*resource_number+resource_number*3+i].value=Available_commit[i]+Allocation_commit[select_process][i];
+        }
     }
 }
 </script>
