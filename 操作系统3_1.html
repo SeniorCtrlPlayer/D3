@@ -33,7 +33,7 @@
                     <th id="state">状态:</th>
                     <th id="news"></th>
                     <td id="commit"><button type="button" onclick="commit(Allocation, Need, Available)" >提交</button></td>
-                    <td><button type="button" onclick="updatematrix();judge(Allocation, Need, Available)">检测</button></td>
+                    <td id="check"><button type="button" onclick="updatematrix();judge(Allocation, Need, Available)">检测</button></td>
                 </tr>
             </tbody>
         </table>
@@ -54,9 +54,6 @@
     process_number = parseInt(mrp[2]);
     //console.log(process_number);
     drawtable(resource_number, process_number);
-    if(method == 'auto'){
-        
-    }
     //var Max = new Array(process_number);
     var Allocation = new Array(process_number);
     var Need = new Array(process_number);
@@ -74,11 +71,67 @@
         Need[i]=new Array(resource_number);
     }
 
+
+    if(method == 'auto'){
+        document.getElementById('check').remove();
+        auto(resource_number, process_number);
+    }
+
 // if(judge(Max, Allocation, Need, Available)){
 //  console.log('安全');
 // }else{
 //  console.log('不安全');
 // }
+
+//自动生成
+function auto(resource_number, process_number){
+    //随机生成0-10之间的整数
+    var autoflag=false;//不安全
+    var Allocation_random;
+    var Need_random;
+    var valueObject = document.getElementsByName('value');
+    var availableObject = document.getElementsByName('Available');
+    var AvailableEdge = new Array(resource_number);
+    for(var i=0;i<resource_number;i++){
+        AvailableEdge[i]=0;
+    }
+    //填充Max, Allocation, Need
+    for(var i=0;i<resource_number;i++){
+        for(var j=0;j<process_number;j++){
+            //生成Allocation
+            Allocation_random = parseInt(10*Math.random());
+            valueObject[3*j*resource_number+resource_number+i].value=Allocation_random;
+            //生成Need
+            Need_random = parseInt(10*Math.random());
+            valueObject[3*j*resource_number+resource_number*2+i].value=Need_random;
+            if(Need_random>AvailableEdge[i]){
+                AvailableEdge[i]=Need_random;
+            }
+            //由Allocation和Need计算Max
+            valueObject[3*j*resource_number+i].value=parseInt(valueObject[3*j*resource_number+resource_number+i].value)+parseInt(valueObject[3*j*resource_number+resource_number*2+i].value);
+        }
+    }
+    //先找到Need中的最大值
+    //for(var i=0;i<resource_number;i++){
+    //    console.log(AvailableEdge[i]);
+    //}
+    //随机填充Available
+    do{
+        for(var i=0;i<resource_number;i++){
+            availableObject[i].value=random(0,AvailableEdge[i]);
+        }
+        //console.log(availableObject.length);
+        updatematrix();
+        if(judge(Allocation, Need, Available)){
+            autoflag=true;
+        }
+    }while(!autoflag);
+    
+    function random(m,n){
+        var num = Math.floor(Math.random()*(m-n)+n);
+        return num;
+    }
+}
 
 //画表函数
 function drawtable(resource_number, process_number){
