@@ -32,8 +32,8 @@
                     </td>
                     <th id="state">状态:</th>
                     <th id="news"></th>
-                    <td id="commit"><button type="button" onclick="commit(Max, Allocation, Need, Available)" >提交</button></td>
-                    <td><button type="button" onclick="updatematrix();judge(Max, Allocation, Need, Available)">检测</button></td>
+                    <td id="commit"><button type="button" onclick="commit(Allocation, Need, Available)" >提交</button></td>
+                    <td><button type="button" onclick="updatematrix();judge(Allocation, Need, Available)">检测</button></td>
                 </tr>
             </tbody>
         </table>
@@ -54,7 +54,10 @@
     process_number = parseInt(mrp[2]);
     //console.log(process_number);
     drawtable(resource_number, process_number);
-    var Max = new Array(process_number);
+    if(method == 'auto'){
+        
+    }
+    //var Max = new Array(process_number);
     var Allocation = new Array(process_number);
     var Need = new Array(process_number);
     var Available = new Array(resource_number);
@@ -66,7 +69,7 @@
     
     //初始化输入框架
     for(var i=0;i<process_number;i++){
-        Max[i]=new Array(resource_number);
+        //Max[i]=new Array(resource_number);
         Allocation[i]=new Array(resource_number);
         Need[i]=new Array(resource_number);
     }
@@ -96,14 +99,51 @@ function drawtable(resource_number, process_number){
             tag_resource.appendChild(tag);
         }
     }
-    for(var i=0;i<process_number;i++){//i代表行
+    
+    //初始化第一行
+    var tr=document.createElement('tr');//建立行
+    table.insertBefore(tr,request_resource);//将行加入表中
+    var p = document.createElement('td');
+    p.innerText='P0';
+    tr.appendChild(p);//将processname加入行头
+    for(var j=0;j<4;j++){//j代表组
+        for(var k=0;k<resource_number;k++){//k代表组里的列
+            var td = document.createElement('td');
+            tr.appendChild(td);
+            var resource = document.createElement('input');
+            if(j==3){
+                resource.name = 'Available';
+            }else{
+                resource.name = 'value';
+            }
+            td.appendChild(resource);
+        }
+        /*            if(!(i>0 && j==3)){
+         for(var k=0;k<resource_number;k++){//k代表组里的列
+         var td = document.createElement('td');
+         tr.appendChild(td);
+         var resource = document.createElement('input');
+         resource.name = 'value';
+         td.appendChild(resource);
+         }
+         }*/
+    }
+    
+    for(var i=1;i<process_number;i++){//i代表行
         var tr=document.createElement('tr');//建立行
         table.insertBefore(tr,request_resource);//将行加入表中
         var p = document.createElement('td');
         p.innerText='P'+i;
         tr.appendChild(p);//将processname加入行头
-        for(var j=0;j<4;j++){//j代表组
-            if(!(i>0 && j==3)){
+        for(var j=0;j<3;j++){//j代表组
+            for(var k=0;k<resource_number;k++){//k代表组里的列
+                var td = document.createElement('td');
+                tr.appendChild(td);
+                var resource = document.createElement('input');
+                resource.name = 'value';
+                td.appendChild(resource);
+            }
+/*            if(!(i>0 && j==3)){
                 for(var k=0;k<resource_number;k++){//k代表组里的列
                     var td = document.createElement('td');
                     tr.appendChild(td);
@@ -111,13 +151,14 @@ function drawtable(resource_number, process_number){
                     resource.name = 'value';
                     td.appendChild(resource);
                 }
-            }
+            }*/
         }
     }
     for(var i=0;i<process_number;i++){
         var option = document.createElement('option');
         option.value = i;
         option.innerText = 'P'+i;
+        option.id = 'p'+i;
         select.appendChild(option);
     }
     var state = document.getElementById('state');
@@ -151,19 +192,20 @@ function updatematrix(){
     //形成矩阵测试
     //0 1  2 3  4 5  6 7
     var news = document.getElementById('news');
-    var ObjectMatrix = document.getElementsByName('value');
+    var valueObject = document.getElementsByName('value');
+    var availableObject = document.getElementsByName('Available');
+    for(var i=0;i<resource_number;i++){
+        Available[i]=parseInt(availableObject[i].value);
+        //console.log('读取到ao :'+availableObject[i].value);
+    }
     for(var i=0;i<process_number;i++){
         for(var j=0;j<resource_number;j++){
-            Max[i][j]=parseInt(ObjectMatrix[4*i*resource_number+j].value);
-            Allocation[i][j]=parseInt(ObjectMatrix[4*i*resource_number+resource_number*1+j].value);
+            Allocation[i][j]=parseInt(valueObject[3*i*resource_number+resource_number*1+j].value);
             //当i=0,j=0时
             //4*i*resource_number+resource_number*1+j = 2
             //4*i*resource_number+resource_number+j = 010
             
-            Need[i][j]=parseInt(ObjectMatrix[4*i*resource_number+resource_number*2+j].value);
-            if(i==0){
-                Available[j]=parseInt(ObjectMatrix[resource_number*3+j].value);
-            }
+            Need[i][j]=parseInt(valueObject[3*i*resource_number+resource_number*2+j].value);
         }
     }
     //console.log(Available[0]);正确读取
@@ -172,16 +214,6 @@ function updatematrix(){
     // for(var i=0;i<Max.length;i++){
     //   for(var j=0;j<Max[0].length;j++){
     //     console.log(Max[i][j]);
-    //   }
-    // }
-    // for(var i=0;i<Need.length;i++){
-    //   for(var j=0;j<Need[0].length;j++){
-    //     console.log(Need[i][j]);
-    //   }
-    // }
-    // for(var i=0;i<Allocation.length;i++){
-    //   for(var j=0;j<Allocation[0].length;j++){
-    //     console.log(Allocation[i][j]);
     //   }
     // }
 }
@@ -206,10 +238,10 @@ function d_copy(matrix){
     }
 }
 
-function judge(Max, Allocation, Need, Available){
+function judge(Allocation, Need, Available){
     //先从输入矩阵中获取值存储到Max, Allocation, Need, Available中
     
-    var Max_judge = Max;
+    //var Max_judge = Max;
     var Allocation_judge = Allocation;
     var Need_judge = Need;
     var Available_judge = d_copy(Available);
@@ -280,12 +312,12 @@ function release_a_line(Allocation_a_line, Available_judge){
     //console.log('the Available is '+Available[0]);
 }
 
-function commit(Max,Allocation,Need,Available){
+function commit(Allocation,Need,Available){
     //console.log(testnumber);
     updatematrix();
     //获取到请求的进程
     //console.log(Max[0][0]);
-    var Max_commit = Max;
+    //var Max_commit = Max;
     var Allocation_commit = d_copy(Allocation);
     var Need_commit = d_copy(Need);
     var Available_commit = d_copy(Available);
@@ -308,13 +340,13 @@ function commit(Max,Allocation,Need,Available){
         //对进程select_process的资源进行更新
         if(judge_a_line(application, Need_commit[select_process])){
             for(var i=0;i<resource_number;i++){
-                console.log(Allocation_commit[select_process][i]);
+                //console.log(Allocation_commit[select_process][i]);
                 Allocation_commit[select_process][i]+=application[i];
-                console.log(Allocation_commit[select_process][i]);
+                //console.log(Allocation_commit[select_process][i]);
                 Need_commit[select_process][i]=Need_commit[select_process][i]-application[i];
                 Available_commit[i]=Available_commit[i]-application[i];
             }
-            if(judge(Max_commit, Allocation_commit, Need_commit, Available_commit)){
+            if(judge(Allocation_commit, Need_commit, Available_commit)){
                 update_line(select_process,Allocation_commit,Need_commit,Available_commit);
             }
         }else{
@@ -326,30 +358,34 @@ function commit(Max,Allocation,Need,Available){
 }
 
 function update_line(select_process,Allocation_commit,Need_commit,Available_commit){
-    var ObjectMatrix = document.getElementsByName('value');
-    console.log('成功进入更新');
+    var valueObject = document.getElementsByName('value');
+    var availableObject = document.getElementsByName('Available');
+    //console.log('读取ao :'+availableObject[0].value);
     
     //判断将Allocation的值回收或者更新
     if(!judge_a_line(Need_commit[select_process],flag0)){
         for(var i=0;i<resource_number;i++){
-            console.log(Allocation_commit[select_process][i]);
-            console.log(ObjectMatrix[4*select_process*resource_number+resource_number*1+i].value);
+            //console.log(Allocation_commit[select_process][i]);
+            //console.log(valueObject[3*select_process*resource_number+resource_number*1+i].value);
             
             //Allocation
-            ObjectMatrix[4*select_process*resource_number+resource_number*1+i].value=Allocation_commit[select_process][i];
+            valueObject[3*select_process*resource_number+resource_number*1+i].value=Allocation_commit[select_process][i];
             
             //Need
-            ObjectMatrix[4*select_process*resource_number+resource_number*2+i].value=Need_commit[select_process][i];
+            valueObject[3*select_process*resource_number+resource_number*2+i].value=Need_commit[select_process][i];
             
             //Available
-            ObjectMatrix[resource_number*3+i].value=Available_commit[i];
+            //console.log(Available_commit[i]);
+            //console.log(availableObject[0].value);
+            availableObject[i].value=Available_commit[i];
         }
     }else{
         for(var i=0;i<resource_number;i++){
-            ObjectMatrix[4*select_process*resource_number+resource_number*1+i].value=0;
-            ObjectMatrix[4*select_process*resource_number+resource_number*2+i].value=0;
-            ObjectMatrix[4*select_process*resource_number+resource_number*3+i].value=Available_commit[i]+Allocation_commit[select_process][i];
+            valueObject[3*select_process*resource_number+resource_number*1+i].value=0;
+            valueObject[3*select_process*resource_number+resource_number*2+i].value=0;
+            availableObject[i].value=Available_commit[i]+Allocation_commit[select_process][i];
         }
+        document.getElementById('p'+select_process).remove();
     }
 }
 </script>
