@@ -58,6 +58,7 @@
     var Allocation = new Array(process_number);
     var Need = new Array(process_number);
     var Available = new Array(resource_number);
+    var ObjectMatrix;
     //console.log('Available初始长度为: '+Available.length);
     
     //初始化输入框架
@@ -224,21 +225,23 @@ function judge(Max, Allocation, Need, Available){
     // for(var n=0;n<process_number && p;n++){//总共遍历process_number轮，每次遍历必释放一个进程
     // 	p=false;//默认不继续
     // 	console.log('进入判断循环');
-    while(i<process_number && flag[i]){//正在遍历第i行
-        if(judge_a_line(Need_judge[i],Available_judge)){
-            console.log('资源可分配');
-            //将标志置为false
-            flag[i]=false;
-            //并将资源回收至Available
-            release_a_line(Allocation_judge[i],Available_judge);
-            
-            //总是判断能够分配的最前面一个资源
-            n++;
-            console.log('n is '+n);
-            if(n!=process_number){
-                console.log('重置i');
-                i = 0;
-                continue;
+    while(i<process_number){//正在遍历第i行
+        if(flag[i]){
+            if(judge_a_line(Need_judge[i],Available_judge)){
+                console.log('资源可分配');
+                //将标志置为false
+                flag[i]=false;
+                //并将资源回收至Available
+                release_a_line(Allocation_judge[i],Available_judge);
+                
+                //总是判断能够分配的最前面一个资源
+                n++;
+                console.log('n is '+n);
+                if(n!=process_number){
+                    console.log('重置i');
+                    i = 0;
+                    continue;
+                }
             }
         }
         i++;
@@ -311,6 +314,12 @@ function commit(Max,Allocation,Need,Available){
         }
     }else{
         alert('超过了可用资源数');
+    }
+}
+
+function update_line(select_process,Application,Allocation,Need,Available){
+    //var
+    for(var i=0;i<resource_number;i++){
     }
 }
 </script>
