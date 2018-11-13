@@ -231,7 +231,7 @@ function judge(Max, Allocation, Need, Available){
     while(i<process_number){//正在遍历第i行
         if(flag[i]){
             if(judge_a_line(Need_judge[i],Available_judge)){
-                console.log('资源可分配');
+                //console.log('资源可分配');
                 //将标志置为false
                 flag[i]=false;
                 //并将资源回收至Available
@@ -241,7 +241,7 @@ function judge(Max, Allocation, Need, Available){
                 n++;
                 //console.log('n is '+n);
                 if(n!=process_number){
-                    console.log('重置i');
+                    //console.log('重置i');
                     i = 0;
                     continue;
                 }
@@ -306,15 +306,19 @@ function commit(Max,Allocation,Need,Available){
     //************************************
     if(judge_a_line(application, Available_commit)){
         //对进程select_process的资源进行更新
-        for(var i=0;i<resource_number;i++){
-            console.log(Allocation_commit[select_process][i]);
-            Allocation_commit[select_process][i]+=application[i];
-            console.log(Allocation_commit[select_process][i]);
-            Need_commit[select_process][i]=Need_commit[select_process][i]-application[i];
-            Available_commit[i]=Available_commit[i]-application[i];
-        }
-        if(judge(Max_commit, Allocation_commit, Need_commit, Available_commit)){
-            update_line(select_process,Allocation_commit,Need_commit,Available_commit);
+        if(judge_a_line(application, Need_commit[select_process])){
+            for(var i=0;i<resource_number;i++){
+                console.log(Allocation_commit[select_process][i]);
+                Allocation_commit[select_process][i]+=application[i];
+                console.log(Allocation_commit[select_process][i]);
+                Need_commit[select_process][i]=Need_commit[select_process][i]-application[i];
+                Available_commit[i]=Available_commit[i]-application[i];
+            }
+            if(judge(Max_commit, Allocation_commit, Need_commit, Available_commit)){
+                update_line(select_process,Allocation_commit,Need_commit,Available_commit);
+            }
+        }else{
+            alert('超出需要的资源数');
         }
     }else{
         alert('超过了可用资源数');
