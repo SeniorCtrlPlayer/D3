@@ -45,9 +45,23 @@
     // var pagesize;
 
     // var test = [1,-1,-1,-1];
-    // var flag = judge(1,test);
-    // console.log(flag)
-    // console.log(judge(2,test))
+    // var flag = LRU_judge(1,test);
+    // console.log(flag);
+    // console.log(LRU_judge(2,test));
+    // var test1 = [1,2,3,-1];
+    // console.log(LRU_judge(1,test1));
+    // console.log(LRU_judge(2,test1));
+    // console.log(LRU_judge(3,test1));
+    // console.log(LRU_judge(4,test1));
+    // console.log(search(test1));
+    // var test2 = [1,2,3,4];
+    // console.log(LRU_judge(1,test2));
+    // console.log(LRU_judge(2,test2));
+    // console.log(LRU_judge(3,test2));
+    // console.log(LRU_judge(4,test2));
+    // console.log(LRU_judge(5,test2));
+    // var test3 = [16,8,-1,-1];
+    // console.log(LRU_judge(25,test3));
     // var test0 = [-1,-1,-1,-1];
     // console.log(judge(1,test0));
     // var test = [1,2,3,4];
@@ -63,7 +77,7 @@
 
     // 生成随机序列
     initord();
-    console.log(ord);
+    // console.log(ord);
 
     function init_afterord() {
         for (var i=0;i<320;i++){
@@ -74,15 +88,16 @@
 
     init_afterord();
     console.log(afterord);
-    for(var i=32;i<=32;i++){
+    for(var i=4;i<=32;i++){
         FIFO(i);
+        LRU(i);
     }
 
     function FIFO(size){
         // 初始化ram
         var n=0;
         var ram = new Array(size);
-        for (var i=0;i<ram.length;i++){
+        for (var i=0;i<size;i++){
             ram[i]=-1;
         }
 
@@ -95,7 +110,7 @@
                 shift(ram);
                 ram[size-1]=afterord[i];
                 n++;
-                console.log("换页中断");
+                // console.log("换页中断");
             }else{
                 ram[t]=afterord[i];
                 n++;
@@ -115,30 +130,33 @@
 
         for (var i=0;i<afterord.length;i++){
             t=LRU_judge(afterord[i],ram);
-            if(t>=0&&t<=3){
+            // console.log(t);
+            if(t>=0&&t<=size-1){
                 // 因为程序局部性原理，命中率高，加速结束判断语句
-                if(ram[t]!=-1){
-                    for (var i=t;i<size;i++){
-
-                    }
-                }else{
-                    ram[t]=afterord[i];
-                    n++;
+                for (var j=t;j<size-1;j++){
+                    ram[j]=ram[j+1];
                 }
-            }else if(t==4){
+                // 无论栈有没有装满，在平移之后，将最后一位置为-1都没有影响
+                ram[size-1]=-1;
+                ram[search(ram)]=afterord[i];
+            }else if(t>=-size&&t<=-1){
+                ram[-1-t]=afterord[i];
+                n++;
+            }else if(t==size){
                 // 将栈底抛出
                 shift(ram);
-                ram[4]=afterord[i];
+                ram[size-1]=afterord[i];
                 n++;
             }
+            // console.log(i,ram);
             // else{
             //     ram[t]=afterord[i];
             //     n++;
             // }
             // console.log(ram);
         }
-        console.log("FIFO实存大小为"+size+"的缺页中断次数："+n);
-        console.log("FIFO实存大小为"+size+"的命中率："+(1-n/320));
+        console.log("LRU实存大小为"+size+"的缺页中断次数："+n);
+        console.log("LRU实存大小为"+size+"的命中率："+(1-n/320));
     }
 
     function printord(ord) {
@@ -184,16 +202,26 @@
     function LRU_judge(x,y) {
         var i=0;
         while(i<y.length){
-            if(y[i]==x||y[i]==-1)
+            if(y[i]==x)
                 return i
+            else if(y[i]==-1){
+                return -1*i-1;
+            }
             i++;
         }
-        return i+1;
+        return i;
     }
 
     function shift(ram){
         for (var i=0;i<ram.length-1;i++){
             ram[i]=ram[i+1];
+        }
+    }
+
+    function search(ram) {
+        for (var i=0;i<ram.length;i++){
+            if(ram[i]==-1)
+                return i;
         }
     }
 </script>
